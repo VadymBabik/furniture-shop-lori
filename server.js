@@ -47,8 +47,26 @@ app.use(passport.initialize());
 // Passport Config
 require('./config/passport')(passport);
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://furniture-shop-lori.herokuapp.com/",
+];
+
 // Use Routes
-app.use(cors());
+app.use(cors({
+      origin: function (origin, callback) {
+        if (!origin) {
+          return callback(null, true);
+        }
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg =
+              "The CORS policy for this site does not allow access from the specified Origin.";
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+      credentials: true,
+    }));
 app.use('/api/configs', globalConfigs);
 app.use('/api/customers', customers);
 app.use('/api/catalog', catalog);
